@@ -25,9 +25,9 @@ public class NeuralNetwork{
         layers.add(layer);
     }
 
-    public void train(DataFrame df, String[] inputColumnName, String outputColumnName){
+    public void train(DataFrame df, String[] inputColumnName, String[] outputColumnName){
         double[][] inputs = df.getColumns(inputColumnName);
-        double[][] targets = df.getSingleColumn(outputColumnName);
+        double[][] targets = df.getColumns(outputColumnName);
         double[][] tinputs = MatrixHelper.transpose(inputs);
         double[][] ttargets = MatrixHelper.transpose(targets);
         for(int row = 0; row < tinputs.length; row++){

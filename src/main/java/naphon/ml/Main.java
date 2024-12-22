@@ -15,27 +15,32 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) {
         DataFrame df = new DataFrame("x1","x2", "y");
-        for(int i = 0; i < 200; i++) df.addRow(createFunction());
+        df.addRow(0,0,0);
+        df.addRow(1,0,1);
+        df.addRow(0,1,1);
+        df.addRow(1,1,0);
         df.represent();
         Optimizer optim = new AdaptiveMomentEstimationOptimizer(.9, .99, 1e-8);
 
-        NeuralNetwork nn = new NeuralNetwork(0.0001, new CrossEntropyLossFunction(),
-                new LinearLayer(2,10, optim),
-                new ReLUActivationFunction(),
-                new LinearLayer(10,10, optim),
-                new ReLUActivationFunction(),
-                new LinearLayer(10,1, optim)
+        NeuralNetwork nn = new NeuralNetwork(0.001, new CrossEntropyLossFunction(),
+                new LinearLayer(2,100, optim),
+                new SigmoidActivationFunction(),
+                new LinearLayer(100,100, optim),
+                new SigmoidActivationFunction(),
+                new LinearLayer(100,20, optim),
+                new SigmoidActivationFunction(),
+                new LinearLayer(20,1, optim)
         );
 
         int totalEpoch = 1000;
         int sub = totalEpoch/10;
         for(int epoch = 0; epoch < totalEpoch ; epoch++){
-            nn.train(df, new String[]{"x1","x2"}, "y");
+            nn.train(df, new String[]{"x1","x2"}, new String[]{"y"});
             if(epoch % sub == 0)
                 System.out.printf("Epoch: [%6d/%6d], Loss = %.6f\n", epoch, totalEpoch, nn.getLoss() >= 0 ? nn.getLoss() : -nn.getLoss());
 
         }
-        double[] x = {1,2};
+        double[] x = {1,0};
         double[] y = nn.forward(x);
         double loss = nn.getLoss() >= 0 ? nn.getLoss() : -nn.getLoss();;
         System.out.printf("Input: %s, Output: %f, loss = %f\n", Arrays.toString(x), y[0], loss);
